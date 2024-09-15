@@ -5,6 +5,7 @@ const UserContext = createContext();
 export const UserContextProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
+  const [uid, setUid] = useState("");
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -14,20 +15,26 @@ export const UserContextProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (newToken) => {
+  const login = (newToken, id) => {
     localStorage.setItem("token", newToken);
+    setUid(id);
     setToken(newToken);
     setIsAuthenticated(true);
+  };
+
+  const getid = () => {
+    return uid;
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
+    setUid(""); // Reset uid on logout
     setIsAuthenticated(false);
   };
 
   return (
-    <UserContext.Provider value={{ isAuthenticated, login, logout }}>
+    <UserContext.Provider value={{ isAuthenticated, login, logout, getid }}>
       {children}
     </UserContext.Provider>
   );

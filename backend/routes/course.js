@@ -1,7 +1,7 @@
 import express from "express";
 import {
   getCourses,
-  getCourseById,
+  getCourseByName,
   createCourse,
   updateCourse,
   deleteCourse,
@@ -11,9 +11,9 @@ import { authenticate } from "../middleware/auth.js";
 const router = express.Router();
 
 router.get("/", getCourses);
-router.get("/:id", getCourseById);
-router.post("/", createCourse);
-router.put("/:id", authenticate, updateCourse);
-router.delete("/:id", authenticate, deleteCourse);
+router.get("/:name", getCourseByName);
+router.post("/", authenticate, createCourse);
+router.put("/:name", authenticate, updateCourse);
+router.delete("/:name", authenticate, deleteCourse);
 
 export default router;

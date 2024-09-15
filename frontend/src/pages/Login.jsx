@@ -45,7 +45,7 @@ const Login = () => {
 
       const data = await response.json();
       showToast("success", "Login Successful");
-      login(data.token);
+      login(data.token, data.userId);
       navigate("/");
     } catch (err) {
       console.error(err);
