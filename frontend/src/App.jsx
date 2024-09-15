@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ToastProvider } from "./hooks/toast";
+import { ToastProvider } from "./hooks/Toast";
 import { UserContextProvider } from "./context/userContext";
 import ProtectedRoute from "./context/protectRoute";
 import Profile from "./pages/Profile";
