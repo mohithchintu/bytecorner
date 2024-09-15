@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "../hooks/toast";
+import { useToast } from "../hooks/Toast";
 import { Select, SelectItem } from "@nextui-org/select";
 
 const Register = () => {
