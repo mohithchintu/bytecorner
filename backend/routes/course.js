@@ -6,13 +6,14 @@ import {
   updateCourse,
   deleteCourse,
 } from "../controllers/course.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
 
 router.get("/", getCourses);
 router.get("/:id", getCourseById);
-router.post("/", createCourse);
-router.put("/:id", updateCourse);
-router.delete("/:id", deleteCourse);
+router.post("/", authenticate, createCourse);
+router.put("/:id", authenticate, updateCourse);
+router.delete("/:id", authenticate, deleteCourse);
 
 export default router;
