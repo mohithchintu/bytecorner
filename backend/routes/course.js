@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/", getCourses);
 router.get("/:id", getCourseById);
-router.post("/", authenticate, createCourse);
+router.post("/", createCourse);
 router.put("/:id", authenticate, updateCourse);
 router.delete("/:id", authenticate, deleteCourse);
 

@@ -1,10 +1,10 @@
 import Booking from "../models/book.js";
-import AvailableCourse from "../models/available_course.js";
+import Course from "../models/course.js";
 
 export const createBooking = async (req, res) => {
   try {
     const { userId, courseId } = req.body;
-    const availableCourse = await AvailableCourse.findOne({
+    const availableCourse = await Course.findOne({
       course_id: courseId,
     });
 
