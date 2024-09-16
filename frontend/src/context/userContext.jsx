@@ -10,13 +10,14 @@ export const UserContextProvider = ({ children }) => {
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) {
-      setToken(savedToken);
+      setToken(savedToken.slice(0, -12));
+      setUid(savedToken.slice(-12));
       setIsAuthenticated(true);
     }
   }, []);
 
   const login = (newToken, id) => {
-    localStorage.setItem("token", newToken);
+    localStorage.setItem("token", newToken + id);
     setUid(id);
     setToken(newToken);
     setIsAuthenticated(true);
@@ -29,7 +30,7 @@ export const UserContextProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
-    setUid(""); // Reset uid on logout
+    setUid("");
     setIsAuthenticated(false);
   };
 

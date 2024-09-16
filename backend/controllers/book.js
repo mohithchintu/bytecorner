@@ -1,16 +1,37 @@
 import Booking from "../models/book.js";
 import Course from "../models/course.js";
+import User from "../models/user.js";
 
 export const createBooking = async (req, res) => {
   try {
     const { userId, courseId } = req.body;
     const availableCourse = await Course.findOne({
-      course_id: courseId,
+      courseId: courseId,
     });
 
     if (!availableCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
+
+    const user = await User.findOne({
+      userId: userId,
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingBooking = await Booking.findOne({
+      userId,
+      courseId,
+    });
+
+    if (existingBooking) {
+      return res
+        .status(400)
+        .json({ message: "User has already booked this course" });
+    }
+
     if (availableCourse.bookings >= availableCourse.max_bookings) {
       if (availableCourse.waitings >= availableCourse.max_waitings) {
         return res

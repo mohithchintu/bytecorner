@@ -28,6 +28,8 @@ const bookSchema = new mongoose.Schema(
   }
 );
 
+bookSchema.index({ userId: 1, courseId: 1 }, { unique: true });
+
 const Booking = mongoose.model("Booking", bookSchema);
 
 export default Booking;

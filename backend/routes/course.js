@@ -12,8 +12,8 @@ const router = express.Router();
 
 router.get("/", getCourses);
 router.get("/:name", getCourseByName);
-router.post("/", authenticate, createCourse);
-router.put("/:name", authenticate, updateCourse);
+router.post("/", createCourse);
+router.put("/:name", updateCourse);
 router.delete("/:name", authenticate, deleteCourse);
 
 export default router;

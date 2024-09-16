@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FaFilePdf,
   FaVideo,
@@ -11,14 +11,17 @@ import {
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { useUser } from "../context/userContext";
+import { useToast } from "../hooks/Toast";
 
 const Courseid = () => {
   const { name } = useParams();
-  const { getid } = useUser();
+  const { getid, isAuthenticated } = useUser();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [bookingSuccess, setBookingSuccess] = useState(false); // For booking confirmation
+  const [isBooked, setIsBooked] = useState(false);
+  const showToast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -37,17 +40,27 @@ const Courseid = () => {
       } catch (error) {
         console.error("Fetch error:", error);
         setError(`Error: ${error.message}`);
+        showToast("error", `Error: ${error.message}`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchCourseData();
-  }, [name]);
+  }, [name, showToast]);
 
   const handleBooking = async () => {
+    if (!isAuthenticated) {
+      showToast("warning", "Please register to continue");
+      navigate("/register");
+      return;
+    }
+
     const uid = getid();
     if (!uid || !course) return;
+
+    const availableSpots = course.max_bookings - course.bookings;
+    const waitingListSpots = course.max_waitings - course.waitings;
 
     const bookingData = {
       userId: uid,
@@ -55,42 +68,66 @@ const Courseid = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/book", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bookingData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to book the course");
+      if (availableSpots > 0) {
+        const response = await fetch("http://localhost:5000/api/book", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to book the course");
+        }
+
+        const responseData = await response.json();
+        setIsBooked(true);
+        showToast("success", responseData.message);
+      } else if (waitingListSpots > 0) {
+        const response = await fetch("http://localhost:5000/api/book", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to add to waiting list");
+        }
+
+        const responseData = await response.json();
+        showToast("normal", responseData.message);
+      } else {
+        showToast("error", "No spots available and waiting list is full.");
       }
-      setBookingSuccess(true);
     } catch (error) {
       console.error("Booking error:", error);
-      setError("Booking failed. Please try again.");
+      showToast("error", error.message || "Booking failed. Please try again.");
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div className="flex items-center justify-center h-screen text-white">
         Loading...
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <div className="flex items-center justify-center h-screen text-red-500">
         {error}
       </div>
     );
-  }
 
-  if (!course) {
-    return null;
-  }
+  if (!course) return null;
+
+  const availableSpots = course.max_bookings - course.bookings;
+  const waitingListSpots = course.max_waitings - course.waitings;
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -135,50 +172,33 @@ const Courseid = () => {
                     <FaUser className="mr-2" /> Tutor: {course.tutor}
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <FaVideo className="mr-2" /> Platform: {course.platform}
+                    <FaCalendar className="mr-2" /> Start Date:{" "}
+                    {course.startDate}
                   </li>
                   <li className="flex items-center text-gray-600">
                     <FaClock className="mr-2" /> Duration: {course.duration}
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <FaTag className="mr-2" /> Genre: {course.genre.join(", ")}
+                    <FaTag className="mr-2" /> Available Spots:{" "}
+                    {availableSpots > 0 ? availableSpots : "None"}
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <FaCalendar className="mr-2" /> Date: {course.date_slot}
-                  </li>
-                  <li className="flex items-center text-gray-600">
-                    <FaClock className="mr-2" /> Time: {course.time_slot}
+                    <FaTag className="mr-2" /> Waiting List Spots:{" "}
+                    {waitingListSpots > 0 ? waitingListSpots : "None"}
                   </li>
                 </ul>
               </div>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-lg mb-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Availability
-              </h3>
-              <p className="text-gray-600">
-                Available Spots: {course.max_bookings - course.bookings}
-              </p>
-              <p className="text-gray-600">
-                Waiting List Spots: {course.max_waitings - course.waitings}
-              </p>
-            </div>
-
-            {bookingSuccess && (
-              <div className="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
-                Booking confirmed! Thank you for your reservation.
-              </div>
-            )}
-
             <button
               onClick={handleBooking}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-              disabled={course.max_bookings - course.bookings <= 0} // Disable if no spots are available
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
             >
-              {course.max_bookings - course.bookings <= 0
-                ? "Fully Booked"
-                : "Book Now"}
+              {availableSpots > 0
+                ? "Book Now"
+                : waitingListSpots > 0
+                ? "Join Waiting List"
+                : "Fully Booked"}
             </button>
           </div>
         </div>

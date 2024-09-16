@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "../hooks/toast";
+import { useToast } from "../hooks/Toast";
 import { Select, SelectItem } from "@nextui-org/select";
 
 const Register = () => {
@@ -31,6 +31,10 @@ const Register = () => {
     return emailRegex.test(email);
   };
 
+  const handleGenreChange = (selectedItems) => {
+    setGenre(selectedItems.target.value);
+  };
+
   const handleRegister = (e) => {
     e.preventDefault();
 
@@ -49,20 +53,12 @@ const Register = () => {
   };
 
   const handleResendOtp = () => {
+    console.log(123456);
     // resend OTP logic
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    console.log(
-      JSON.stringify({
-        username,
-        email,
-        mobile,
-        password,
-        genre,
-      })
-    );
 
     if (otp === sentOTP.toString()) {
       try {
@@ -92,7 +88,7 @@ const Register = () => {
           setConfirmPassword("");
           setOtp("");
           setIsOtpSent(false);
-          navigate("/");
+          navigate("/login");
         } else {
           showToast(
             "error",
@@ -106,10 +102,6 @@ const Register = () => {
     } else {
       showToast("error", "Invalid OTP. Please try again.");
     }
-  };
-
-  const handleGenreChange = (selectedItems) => {
-    setGenre(selectedItems);
   };
 
   return (
@@ -221,19 +213,18 @@ const Register = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm pl-2">
-                    Skills you are interested in
-                  </label>
+                  <div className="text-sm pl-2">Skills you are interested</div>
                   <Select
                     required
                     value={genre}
+                    aria-label="skills"
                     placeholder="Select multiple"
                     selectionMode="multiple"
                     className="rounded-xl w-full border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                     onChange={handleGenreChange}
                   >
-                    {skills.map((skill) => (
-                      <SelectItem key={skill.key} value={skill.key}>
+                    {skills.map((skill, index) => (
+                      <SelectItem key={index} value={skill.key}>
                         {skill.label}
                       </SelectItem>
                     ))}
