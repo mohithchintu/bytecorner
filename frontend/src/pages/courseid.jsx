@@ -28,7 +28,7 @@ const Courseid = () => {
       try {
         const encodedName = encodeURIComponent(name);
         const response = await fetch(
-          `http://localhost:5000/api/course/${encodedName}`
+          `${import.meta.env.VITE_API_LINK}/api/course/${encodedName}`
         );
         if (!response.ok) {
           throw new Error(
@@ -69,13 +69,16 @@ const Courseid = () => {
 
     try {
       if (availableSpots > 0) {
-        const response = await fetch("http://localhost:5000/api/book", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bookingData),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_LINK}/api/book`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bookingData),
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -86,13 +89,16 @@ const Courseid = () => {
         setIsBooked(true);
         showToast("success", responseData.message);
       } else if (waitingListSpots > 0) {
-        const response = await fetch("http://localhost:5000/api/book", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bookingData),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_LINK}/api/book`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(bookingData),
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();

@@ -63,7 +63,7 @@ const Register = () => {
     if (otp === sentOTP.toString()) {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/users/register",
+          `${import.meta.env.VITE_API_LINK}/api/users/register`,
           {
             method: "POST",
             headers: {
