@@ -9,7 +9,6 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
 
 connectDB();
 
@@ -24,7 +23,3 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/course", courseRoutes);
 app.use("/api/book", bookRoutes);
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
