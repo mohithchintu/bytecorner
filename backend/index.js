@@ -10,12 +10,13 @@ dotenv.config();
 
 const app = express();
 
+app.listen(5000);
 connectDB();
 
 app.use(
   cors({
-    origin: ["https://bytecorner.vercel.app/"],
-    credentials: true,
+    origin: ["https://bytecorner.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
 
