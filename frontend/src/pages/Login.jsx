@@ -52,7 +52,7 @@ const Login = () => {
       navigate("/");
     } catch (err) {
       console.error(err);
-      showToast("error", "Something went wrong, please try again.");
+      showToast("error", "Invalid email or password.");
     } finally {
       setLoading(false);
     }
